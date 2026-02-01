@@ -138,6 +138,8 @@ SEED_QUERIES: tuple[str, ...] = (
     "INSERT OR IGNORE INTO meal_categories (id, name, display_order) VALUES (3, 'Kolacja', 3);",
     "INSERT OR IGNORE INTO units (name) VALUES ('gramy');",
     "INSERT OR IGNORE INTO units (name) VALUES ('mililitry');",
+    "INSERT OR IGNORE INTO units (name) VALUES ('kg');",
+    "INSERT OR IGNORE INTO units (name) VALUES ('litry');",
     "INSERT OR IGNORE INTO units (name) VALUES ('sztuki');",
 )
 
