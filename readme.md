@@ -58,7 +58,6 @@ To get a local copy up and running, follow these simple steps.
     ```
 
 3.  **Install dependencies:**
-    *(Assuming dependencies will be listed in a requirements.txt file)*
     ```sh
     pip install -r requirements.txt
     ```
@@ -69,6 +68,8 @@ Execute the main Python script to launch the application:
 ```sh
 python main.py
 ```
+
+> **Tip:** When using the provided virtual environment, run the entry point with `.venv/bin/python main.py` on Unix-like systems or `.\.venv\Scripts\python.exe main.py` on Windows to ensure the correct interpreter is used.
 
 ## Available Scripts
 

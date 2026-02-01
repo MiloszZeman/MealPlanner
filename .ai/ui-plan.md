@@ -21,8 +21,8 @@ Nawigacja jest kontekstowa i opiera się na akcjach użytkownika (np. kliknięci
     - Lista rozwijana z nazwami profili.
     - Pole do wprowadzania hasła.
     - Przycisk "Zaloguj".
-    - Przycisk "Stwórz nowy profil" (przenoszący do formularza rejestracji w tym samym widoku).
-    - Formularz tworzenia profilu (pola: Nazwa profilu, Hasło, Powtórz hasło; początkowo ukryty).
+    - Przycisk "Utwórz konto", który odsłania (a po aktywacji pozwala ukryć przyciskiem "Anuluj") formularz rejestracji w tym samym widoku.
+    - Formularz tworzenia profilu (pola: Nazwa profilu, Hasło, Powtórz hasło) renderowany dynamicznie po kliknięciu i początkowo ukryty.
     - Etykiety do wyświetlania błędów walidacji (np. "Profil o tej nazwie już istnieje.", "Nieprawidłowe hasło.").
 - **UX, dostępność i względy bezpieczeństwa:**
     - **UX:** Prosty, jednoznaczny ekran startowy. Pole hasła aktywuje się po wybraniu profilu.
