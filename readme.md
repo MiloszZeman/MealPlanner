@@ -17,7 +17,7 @@ A desktop application to simplify your weekly meal planning and grocery shopping
 
 ## Project Description
 
-MealPlanner is a desktop application built with Electron, designed for users who want to streamline their meal planning process. The app helps you save time and reduce the stress of figuring out what to eat and what to buy.
+MealPlanner is a desktop application built with Python and Tkinter, designed for users who want to streamline their meal planning process. The app helps you save time and reduce the stress of figuring out what to eat and what to buy.
 
 The core problem this application solves is the time-consuming nature of planning meals and creating corresponding shopping lists for an entire week. This often leads to last-minute, unplanned trips to the grocery store. MealPlanner provides a simple, intuitive tool to create weekly meal plans and automatically generate an aggregated shopping list, ensuring you have all the necessary ingredients before you start cooking.
 
@@ -71,10 +71,19 @@ python main.py
 
 > **Tip:** When using the provided virtual environment, run the entry point with `.venv/bin/python main.py` on Unix-like systems or `.\.venv\Scripts\python.exe main.py` on Windows to ensure the correct interpreter is used.
 
+#### Konto demonstracyjne
+
+Po pierwszym uruchomieniu dostępne jest konto pokazowe:
+
+- nazwa profilu: `demo`
+- hasło: `demo`
+
+Profil zawiera 21 przykładowych przepisów (po 7 na każdą kategorię posiłku), dzięki czemu można od razu wygenerować tygodniowy plan i listę zakupów.
+
 ## Available Scripts
 
 *   `python main.py`: Runs the main application.
-*   `python -m unittest discover`: Runs the test suite (assuming tests are in a `tests` directory).
+*   `python -m pytest`: Runs the automated test suite.
 
 ## Project Scope
 
