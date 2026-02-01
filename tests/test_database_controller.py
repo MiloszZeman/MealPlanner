@@ -9,11 +9,12 @@ from meal_planner.database.controller import (
     AuthenticationError,
     DatabaseController,
     DatabaseError,
-    MealCategory,
     MealPlanEntry,
     RecipeDetail,
     RecipeIngredientInput,
 )
+
+
 def test_create_profile_persists_user_and_hashes_password(db_controller: DatabaseController) -> None:
     user = db_controller.create_profile("Jan", "sekret")
 

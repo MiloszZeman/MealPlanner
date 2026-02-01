@@ -1,0 +1,85 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: ./.github/actions/python-setup
+        with:
+          extra-packages: "flake8 pytest-cov"
+      - name: Run flake8
+        run: flake8 meal_planner tests
+
+  unit-test:
+    needs: lint
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: ./.github/actions/python-setup
+        with:
+          extra-packages: "pytest-cov"
+      - name: Run unit tests
+        run: pytest tests/test_database_controller.py --cov=meal_planner --cov-report=term-missing --cov-report=xml:unit-coverage.xml
+      - name: Upload unit coverage
+        uses: actions/upload-artifact@v6
+        with:
+          name: unit-coverage
+          path: unit-coverage.xml
+
+  e2e-test:
+    needs: lint
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: ./.github/actions/python-setup
+        with:
+          extra-packages: "pytest-cov"
+      - name: Install GUI dependencies
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y xvfb python3-tk
+      - name: Run e2e tests
+        run: xvfb-run -a pytest tests/test_e2e.py --cov=meal_planner --cov-report=term-missing --cov-report=xml:e2e-coverage.xml
+      - name: Upload e2e coverage
+        uses: actions/upload-artifact@v6
+        with:
+          name: e2e-coverage
+          path: e2e-coverage.xml
+
+  status-comment:
+    needs:
+      - lint
+      - unit-test
+      - e2e-test
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Post success comment
+        uses: actions/github-script@v8
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.payload.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Lint, unit tests, and e2e tests passed with coverage.'
+            });

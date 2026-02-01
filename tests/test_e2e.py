@@ -32,7 +32,7 @@ def test_e2e_new_user_flow_generates_plan_and_list(db_controller: DatabaseContro
     authenticated = db_controller.authenticate("nowyuzytkownik", "silnehaslo")
     assert authenticated.id == user.id
 
-    breakfast = db_controller.create_recipe(
+    _ = db_controller.create_recipe(
         user.id,
         "Jajecznica",
         [categories["Śniadanie"]],
