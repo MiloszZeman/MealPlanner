@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from datetime import date, timedelta
-from pathlib import Path
 
 import pytest
 
@@ -15,18 +14,6 @@ from meal_planner.database.controller import (
     RecipeDetail,
     RecipeIngredientInput,
 )
-
-
-@pytest.fixture()
-def db_controller(tmp_path: Path) -> DatabaseController:
-    db_path = tmp_path / "mealplanner-test.db"
-    controller = DatabaseController(db_path)
-    try:
-        yield controller
-    finally:
-        controller.close()
-
-
 def test_create_profile_persists_user_and_hashes_password(db_controller: DatabaseController) -> None:
     user = db_controller.create_profile("Jan", "sekret")
 
@@ -38,6 +25,14 @@ def test_create_profile_persists_user_and_hashes_password(db_controller: Databas
     stored_hash = cursor.fetchone()["password_hash"]
     assert stored_hash != "sekret"
     assert stored_hash.startswith("$2b$")
+
+
+def test_create_profile_rejects_blank_inputs(db_controller: DatabaseController) -> None:
+    with pytest.raises(ValueError, match="Nazwa profilu jest wymagana"):
+        db_controller.create_profile("   ", "secret")
+
+    with pytest.raises(ValueError, match="Hasło jest wymagane"):
+        db_controller.create_profile("Valid", "")
 
 
 def test_duplicate_profile_name_raises_database_error(db_controller: DatabaseController) -> None:
@@ -122,6 +117,19 @@ def test_create_recipe_and_fetch_details(db_controller: DatabaseController, user
     assert detail.ingredients[0].ingredient_name == "Płatki owsiane"
 
 
+def test_create_recipe_validates_required_inputs(db_controller: DatabaseController, user, units_map, categories_map) -> None:
+    ingredient = _make_ingredient("Jajka", units_map["sztuki"].id, 2.0)
+
+    with pytest.raises(ValueError, match="Nazwa przepisu jest wymagana"):
+        db_controller.create_recipe(user.id, "   ", [categories_map["Śniadanie"].id], [ingredient])
+
+    with pytest.raises(ValueError, match="Wybierz co najmniej jedną kategorię posiłku"):
+        db_controller.create_recipe(user.id, "Omlet", [], [ingredient])
+
+    with pytest.raises(ValueError, match="Dodaj przynajmniej jeden składnik"):
+        db_controller.create_recipe(user.id, "Omlet", [categories_map["Śniadanie"].id], [])
+
+
 def test_update_recipe_overwrites_categories_and_ingredients(db_controller: DatabaseController, user, units_map, categories_map) -> None:
     recipe = db_controller.create_recipe(
         user.id,
@@ -202,6 +210,25 @@ def test_update_meal_plan_entry_validates_category(db_controller: DatabaseContro
         db_controller.update_meal_plan_entry(user.id, breakfast_entry.id, dinner_recipe.id)
 
 
+def test_update_meal_plan_entry_accepts_valid_recipe_and_none(db_controller: DatabaseController, user, units_map, categories_map) -> None:
+    _seed_full_recipe_set(db_controller, user, units_map, categories_map)
+    alternate = db_controller.create_recipe(
+        user.id,
+        "Jaglanka",
+        [categories_map["Śniadanie"].id],
+        [_make_ingredient("Kasza jaglana", units_map["gramy"].id, 60.0)],
+    )
+
+    plan = db_controller.generate_weekly_meal_plan(user.id)
+    breakfast_entry = next(entry for entry in plan if entry.meal_category_name == "Śniadanie")
+
+    updated_entry = db_controller.update_meal_plan_entry(user.id, breakfast_entry.id, alternate.id)
+    assert updated_entry.recipe_id == alternate.id
+
+    cleared_entry = db_controller.update_meal_plan_entry(user.id, breakfast_entry.id, None)
+    assert cleared_entry.recipe_id is None
+
+
 def test_build_shopping_list_aggregates_quantities(db_controller: DatabaseController, user, units_map, categories_map) -> None:
     _seed_full_recipe_set(db_controller, user, units_map, categories_map)
 
@@ -226,6 +253,42 @@ def test_build_shopping_list_aggregates_quantities(db_controller: DatabaseContro
     assert names["Sałata"].total_quantity is not None
     # 7 dni * 50 gramów = 350
     assert pytest.approx(names["Sałata"].total_quantity) == 350.0
+
+
+def test_build_shopping_list_preserves_symbolic_items(db_controller: DatabaseController, user, units_map, categories_map) -> None:
+    db_controller.create_recipe(
+        user.id,
+        "Herbata",
+        [categories_map["Śniadanie"].id],
+        [
+            RecipeIngredientInput(
+                name="Sól",
+                unit_id=units_map["gramy"].id,
+                quantity=0.0,
+                is_symbolic=True,
+            )
+        ],
+    )
+    db_controller.create_recipe(
+        user.id,
+        "Zupa",
+        [categories_map["Obiad"].id],
+        [_make_ingredient("Bulion", units_map["mililitry"].id, 400.0)],
+    )
+    db_controller.create_recipe(
+        user.id,
+        "Sałatka",
+        [categories_map["Kolacja"].id],
+        [_make_ingredient("Warzywa", units_map["gramy"].id, 120.0)],
+    )
+
+    db_controller.generate_weekly_meal_plan(user.id)
+
+    items = db_controller.build_shopping_list(user.id)
+    salt_item = next(item for item in items if item.ingredient_name == "Sól")
+    assert salt_item.is_symbolic
+    assert salt_item.total_quantity is None
+    assert salt_item.unit_name is None
 
 
 def test_delete_recipe_reassigns_plan_if_alternative_exists(db_controller: DatabaseController, user, units_map, categories_map) -> None:
