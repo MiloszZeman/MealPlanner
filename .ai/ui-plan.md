@@ -23,6 +23,7 @@ Nawigacja jest kontekstowa i opiera się na akcjach użytkownika (np. kliknięci
     - Przycisk "Zaloguj".
     - Przycisk "Utwórz konto", który odsłania (a po aktywacji pozwala ukryć przyciskiem "Anuluj") formularz rejestracji w tym samym widoku.
     - Formularz tworzenia profilu (pola: Nazwa profilu, Hasło, Powtórz hasło) renderowany dynamicznie po kliknięciu i początkowo ukryty.
+    - Domyślnie dostępne konto demonstracyjne "demo" (hasło "demo") pozwala od razu przetestować wszystkie funkcje aplikacji.
     - Etykiety do wyświetlania błędów walidacji (np. "Profil o tej nazwie już istnieje.", "Nieprawidłowe hasło.").
 - **UX, dostępność i względy bezpieczeństwa:**
     - **UX:** Prosty, jednoznaczny ekran startowy. Pole hasła aktywuje się po wybraniu profilu.
@@ -38,7 +39,7 @@ Nawigacja jest kontekstowa i opiera się na akcjach użytkownika (np. kliknięci
     - Lista zakupów w panelu bocznym.
     - Komunikat powitalny dla nowych użytkowników.
 - **Kluczowe komponenty widoku:**
-    - Pasek nawigacyjny z przyciskami "Moje przepisy", "Wyloguj".
+    - Pasek nawigacyjny z przyciskami ustawionymi od prawej: "Wyloguj", "Moje przepisy", "Wygeneruj plan".
     - Przycisk "Wygeneruj plan".
     - Widok Planu Tygodniowego (`MealPlanView`) jako główny komponent.
     - Panel Boczny Listy Zakupów (`ShoppingListView`).
@@ -75,7 +76,7 @@ Nawigacja jest kontekstowa i opiera się na akcjach użytkownika (np. kliknięci
     - Dynamiczna lista składników, gdzie każdy wiersz (`IngredientRow`) zawiera:
         - Pole tekstowe na nazwę składnika.
         - Pole numeryczne na ilość.
-        - Lista rozwijana z jednostkami (gramy, mililitry, sztuki).
+        - Lista rozwijana z jednostkami (gramy, kilogramy, mililitry, litry, sztuki).
         - Checkbox "Ilość symboliczna".
         - Przycisk do usunięcia wiersza.
     - Przycisk "+ Dodaj składnik" do dodawania nowych wierszy.
@@ -121,7 +122,7 @@ Wszystkie widoki "podrzędne" (jak `RecipeListView` czy `RecipeFormView`) zawier
 
 - **ViewController:** Centralna klasa zarządzająca przełączaniem widoków. Przechowuje stan aplikacji (np. ID zalogowanego użytkownika) i przekazuje go do odpowiednich widoków.
 - **DatabaseController:** Hermetyzuje całą komunikację z bazą danych SQLite. Widoki UI komunikują się tylko z tym kontrolerem, a nie bezpośrednio z bazą.
-- **MealPlanView:** Komponent w formie siatki (grid) 7x3, odpowiedzialny za wyświetlanie planu. Każda komórka umożliwia edycję posiłku. Posiada metodę `refresh()`, która odświeża jego zawartość.
-- **ShoppingListView:** Komponent wyświetlający posortowaną listę zakupów. Posiada metodę `refresh(plan_data)`, która na nowo generuje listę na podstawie aktualnego planu.
+- **MealPlanView:** Komponent w formie siatki (grid) 7x3, odpowiedzialny za wyświetlanie planu. Nagłówki wierszy pokazują datę nad polską nazwą dnia tygodnia, a każda komórka umożliwia edycję posiłku. Posiada metodę `refresh()`, która odświeża jego zawartość.
+- **ShoppingListView:** Komponent wyświetlający posortowaną listę zakupów. Automatycznie konwertuje ilości powyżej 1000 gramów na kilogramy oraz powyżej 1000 mililitrów na litry i udostępnia metodę `update_items()`, która na nowo generuje listę na podstawie aktualnego planu.
 - **IngredientRow:** Niestandardowy widżet (Frame) hermetyzujący logikę i pola jednego wiersza składnika w formularzu przepisu. Umożliwia łatwe, dynamiczne zarządzanie listą składników.
 - **Modalne okna dialogowe (`tkinter.messagebox`):** Używane do uzyskiwania potwierdzeń krytycznych akcji, takich jak usuwanie danych czy nadpisywanie istniejącego planu.

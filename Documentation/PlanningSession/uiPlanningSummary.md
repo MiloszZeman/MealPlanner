@@ -9,6 +9,8 @@ i lista zakupów) za pomocą widżetu PanedWindow.
 8. Długotrwałe operacje na bazie danych będą obsługiwane w osobnych wątkach, a interfejs będzie informował o stanie oczekiwania poprzez zmianę kursora.
 9. Do obsługi potwierdzeń od użytkownika (np. usuwanie, generowanie planu) będą używane standardowe okna dialogowe z modułu tkinter.messagebox.
 10. Zostanie stworzona centralna metoda refresh_meal_plan_view() do odświeżania widoku planu po każdej modyfikacji danych.
+11. Nagłówki planu prezentują datę nad polską nazwą dnia tygodnia, aby zachować pełną lokalizację interfejsu.
+12. Lista zakupów automatycznie przelicza masę powyżej 1000 gramów na kilogramy oraz objętość powyżej 1000 mililitrów na litry, udostępniając te jednostki również w formularzach.
 </decisions>
 <matched_recommendations>
 
