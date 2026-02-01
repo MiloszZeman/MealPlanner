@@ -5,7 +5,7 @@ from datetime import date
 import tkinter as tk
 from tkinter import ttk
 
-from meal_planner.database.controller import MealCategory, MealPlanEntry, RecipeSummary
+from meal_planner.database.controller import MealCategory, MealPlanEntry
 
 
 class MealPlanView(ttk.Frame):
